@@ -12,6 +12,17 @@ This library takes the output of `dir` and runs the following steps:
 1. Groups the attributes and methods by the class they are defined by
 2. Identifies if it is a dunder method, normal method, or attribute
 3. Pulls the summary of the docstring for the attribute/method, if it exists
+4. Colorizes the output to visually differentiate the classes, attributes, methods, and dunder methods
+
+## Demo
+
+Running the code in [demo.py](demo.py), you can see the difference between the built-in `dir` and `ppdir` here:
+
+Before:
+
+
+After:
+
 
 
 # Dev Instructions

@@ -36,4 +36,4 @@ class NextLayer(BaseLayer):
 
 x = NextLayer(x=1, y=2, z=3, a="b")
 print(dir(x))
-ppdir(x, include_dunders=False)
+ppdir(x)
