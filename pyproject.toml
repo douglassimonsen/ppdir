@@ -1,0 +1,56 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ppdir"
+description = "Better "
+readme = "README.md"
+requires-python = ">=3.11.0"
+dynamic = ["version"]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+  "build>=1.2.2",
+]
+
+[tool.hatch.version]
+path = "ppdir/__init__.py"
+
+[tool.doc8]
+max-line-length = 120
+file-encoding = "utf8"
+
+[tool.ruff]
+line-length = 120
+preview = true
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+  "ANN401",  # https://docs.astral.sh/ruff/rules/any-type/
+  "CPY001",  # https://docs.astral.sh/ruff/rules/missing-copyright-notice/
+  "DOC201",  # https://docs.astral.sh/ruff/rules/docstring-missing-returns/
+  "D100",    # https://docs.astral.sh/ruff/rules/undocumented-public-module/
+  "D401",    # https://docs.astral.sh/ruff/rules/non-imperative-mood/
+  "ERA001",  # https://docs.astral.sh/ruff/rules/commented-out-code/
+  "PLR1722", # https://docs.astral.sh/ruff/rules/sys-exit-alias/
+  "RUF012",
+  "SLF001",  # https://docs.astral.sh/ruff/rules/private-member-access/
+  "S101",
+  "T100",    # https://docs.astral.sh/ruff/rules/debugger/
+  "T201",    # https://docs.astral.sh/ruff/rules/print/
+  "TD002",
+  "TD003",
+  "D101",
+  "D102",
+  "D103",
+  "D104",
+  "D105",
+  "D107",
+]
+
+[tool.mypy]
+disable_error_code = "import-untyped"
