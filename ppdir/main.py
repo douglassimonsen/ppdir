@@ -16,10 +16,11 @@ class Attributes:
         # Adding a trailing space since splitlines returns an empty list from an empty string. Gets removed by the strip
         return (self.docstring + " ").splitlines()[0].strip()
 
-    def to_string(self, *, include_docs: bool) -> str:
+    def to_string(self, *, max_len: int, include_docs: bool) -> str:
         if include_docs and self.summary():
             short_summary = self.summary()
-            return f"{self.name}:   {short_summary}"
+            spacing = " " * (max_len - len(self.name) + 1)
+            return f"{self.name}:{spacing}{short_summary}"
         return self.name
 
 
@@ -46,16 +47,26 @@ def _display(
         vals = data[class_name]
         if vals.attributes:
             print("    Attributes:")
+            max_len = max(len(val.name) for val in vals.attributes)
             for val in vals.attributes:
-                print(f"        {Fore.GREEN}{val.to_string(include_docs=include_docs)}{Style.RESET_ALL}")
+                val_str = val.to_string(include_docs=include_docs, max_len=max_len)
+                print(
+                    f"        {Fore.GREEN}{val_str}{Style.RESET_ALL}",
+                )
         if vals.methods:
             print("    Methods:")
+            max_len = max(len(val.name) for val in vals.methods)
             for val in vals.methods:
-                print(f"        {Fore.YELLOW}{val.to_string(include_docs=include_docs)}{Style.RESET_ALL}")
+                val_str = val.to_string(include_docs=include_docs, max_len=max_len)
+                print(
+                    f"        {Fore.YELLOW}{val_str}{Style.RESET_ALL}",
+                )
         if vals.dunders and include_dunders:
             print("    Dunders:")
+            max_len = max(len(val.name) for val in vals.dunders)
             for val in vals.dunders:
-                print(f"        {Fore.RED}{val.to_string(include_docs=include_docs)}{Style.RESET_ALL}")
+                val_str = val.to_string(include_docs=include_docs, max_len=max_len)
+                print(f"        {Fore.RED}{val_str}{Style.RESET_ALL}")
 
 
 def _expanded_dir(main_cls: type, all_mros: list[type]) -> list[str]:
