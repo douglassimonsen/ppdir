@@ -8,7 +8,9 @@ description = "Better "
 readme = "README.md"
 requires-python = ">=3.11.0"
 dynamic = ["version"]
-dependencies = []
+dependencies = [
+  "colorama>=0.4.6",
+]
 
 [project.optional-dependencies]
 dev = [
