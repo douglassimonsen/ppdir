@@ -20,9 +20,11 @@ Running the code in [demo.py](demo.py), you can see the difference between the b
 
 Before:
 
+![before](/example_images/before.png)
 
 After:
 
+![after](/example_images/after.png)
 
 
 # Dev Instructions
