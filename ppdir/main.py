@@ -44,7 +44,7 @@ def _display(
 ) -> None:
     for class_name in class_order:
         print(f"\n{Fore.BLUE}{class_name}{Style.RESET_ALL}")
-        vals = data[class_name]
+        vals = data.get(class_name, Categories())
         if vals.attributes:
             print("    Attributes:")
             max_len = max(len(val.name) for val in vals.attributes)
@@ -79,19 +79,35 @@ def _expanded_dir(main_cls: type, all_mros: list[type]) -> list[str]:
             key for prior_cls in prior_mros for key in getattr(prior_cls, "__pydantic_fields__", {})
         ]
         ret.extend(key for key in main_cls.__pydantic_fields__ if key not in prior_mros_pydantic_fields)
+    ret.sort()
     return ret
+
+
+def _find_base_class(meta: Attributes, mro_dict: dict[str, list[str]], ppdir_dict: dict[str, Categories]):
+    for cls, cls_dir in mro_dict.items():
+        if meta.name in cls_dir:
+            categories = ppdir_dict.setdefault(cls, Categories())
+            if _is_dunder(meta.name):
+                categories.dunders.append(meta)
+            else:
+                categories.attributes.append(meta)
+            break
+    else:
+        msg = f"Unmatched val: {meta.name}"
+        raise ValueError(msg)
 
 
 def ppdir(inp_cls: Any, *, include_dunders: bool = False, include_docs: bool = True) -> None:
     mros = inp_cls.__class__.mro()
     mro_dict = {cls.__name__: _expanded_dir(cls, mros) for cls in mros}
     ppdir_dict: dict[str, Categories] = {}
-    for val in dir(inp_cls):
-        if val in ("__signature__"):
+
+    class_attrs = dir(inp_cls)
+    for val in class_attrs:
+        if val == "__signature__":
             continue
 
         attr = getattr(inp_cls, val)
-
         meta = Attributes(name=val, docstring=attr.__doc__ or "")
         if isinstance(attr, Callable):
             base_class_name = attr.__qualname__.split(".", 1)[0]
@@ -101,17 +117,8 @@ def ppdir(inp_cls: Any, *, include_dunders: bool = False, include_docs: bool = T
             else:
                 categories.methods.append(meta)
         else:
-            for cls, cls_dir in mro_dict.items():
-                if val in cls_dir:
-                    categories = ppdir_dict.setdefault(cls, Categories())
-                    if _is_dunder(val):
-                        categories.dunders.append(meta)
-                    else:
-                        categories.attributes.append(meta)
-                    break
-            else:
-                msg = f"Unmatched val: {val}"
-                raise ValueError(msg)
+            _find_base_class(meta, mro_dict, ppdir_dict)
+
     _display(
         ppdir_dict,
         class_order=[cls.__name__ for cls in mros],

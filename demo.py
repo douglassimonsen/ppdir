@@ -15,6 +15,13 @@ class BaseLayer(BaseModel):
         """
         print("asd")
 
+    def func2(self) -> None:
+        """Example test.
+
+        Details are here
+        """
+        print("asd")
+
 
 class NextLayer(BaseLayer):
     a: str
@@ -23,5 +30,10 @@ class NextLayer(BaseLayer):
         """Example text."""
         return 1
 
+    def func(self) -> None:
+        """Asdasd."""
 
-ppdir(NextLayer(x=1, y=2, z=3, a="b"))
+
+x = NextLayer(x=1, y=2, z=3, a="b")
+print(dir(x))
+ppdir(x, include_dunders=False)
