@@ -26,7 +26,8 @@ class BaseLayer(BaseModel):
 class NextLayer(BaseLayer):
     a: str
 
-    def test(self) -> int:
+    @staticmethod
+    def test() -> int:
         """Example text."""
         return 1
 
