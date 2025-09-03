@@ -42,7 +42,8 @@ def _display(
     include_dunders: bool = False,
     include_docs: bool = True,
 ) -> None:
-    for class_name in class_order:
+    # We reverse the class order so the most specific class is on the bottom since that's likely what people care about
+    for class_name in class_order[::-1]:
         print(f"\n{Fore.BLUE}{class_name}{Style.RESET_ALL}")
         vals = data.get(class_name, Categories())
         if vals.attributes:
