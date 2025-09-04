@@ -6,7 +6,8 @@ on:
     branches:
       - main
 env:
-  PACKAGE_NAME: pretty-dir
+  PACKAGE_NAME: ppdir
+  PYPI_NAME: pretty-dir
 
 jobs:
   tag:
@@ -109,7 +110,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/${{ env.PACKAGE_NAME }} # Replace <package-name> with your PyPI project name
+      url: https://pypi.org/p/${{ env.PYPI_NAME }}
     permissions:
       id-token: write # IMPORTANT: mandatory for trusted publishing
 
