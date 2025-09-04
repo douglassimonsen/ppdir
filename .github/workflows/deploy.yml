@@ -1,0 +1,146 @@
+# Setup: go to https://github.com/<org/username>/<repo>/settings/actions and set Workflow permissions to "Read and write permissions"
+name: Tag and Release on Version Change
+
+on:
+  push:
+    branches:
+      - main
+env:
+  PACKAGE_NAME: pretty-dir
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get_version.outputs.VERSION }}
+      tagged: ${{ steps.check_tag.outputs.TAG_EXISTS == 'false' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+            fetch-depth: 0  # Fetch all history for tags
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Get current version from file
+        id: get_version
+        run: |
+          VERSION=$(grep -oP '__version__ = \"\K[^\"]*' $PACKAGE_NAME/__init__.py)
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Check if tag already exists
+        id: check_tag
+        run: |
+          if git rev-parse "refs/tags/v${{ steps.get_version.outputs.VERSION }}" >/dev/null 2>&1; then
+            echo "TAG_EXISTS=true" >> $GITHUB_OUTPUT
+          else
+            echo "TAG_EXISTS=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create tag and GitHub release
+        if: steps.check_tag.outputs.TAG_EXISTS == 'false'
+        env:
+          VERSION: ${{ steps.get_version.outputs.VERSION }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag -a "v$VERSION" -m "Release v$VERSION"
+          git push origin "v$VERSION"
+          
+          gh release create "v$VERSION" \
+            --title "v$VERSION" \
+            --notes "Automated release for version $VERSION"
+  release:
+    needs: tag
+    if: needs.tag.outputs.tagged == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code at tag
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Required to access tags
+          ref: "refs/tags/v${{ needs.tag.outputs.version }}"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Build package (sdist and wheel)
+        run: |
+          python -m pip install --upgrade build
+          python -m build
+
+      - name: Get commit message for release notes
+        id: commit_message
+        run: |
+          MSG=$(git log -1 --pretty=%B)
+          echo "MSG<<EOF" >> $GITHUB_OUTPUT
+          echo "$MSG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Upload GitHub release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: "v${{ needs.tag.outputs.version }}"
+          name: "v${{ needs.tag.outputs.version }}"
+          body: "${{ steps.commit_message.outputs.MSG }}"
+          files: |
+            dist/*.whl
+            dist/*.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload dist artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-files
+          path: dist/*
+  publish:
+    needs: 
+      - release
+      - tag
+    if: needs.tag.outputs.tagged == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/${{ env.PACKAGE_NAME }} # Replace <package-name> with your PyPI project name
+    permissions:
+      id-token: write # IMPORTANT: mandatory for trusted publishing
+
+
+    steps:
+      - name: Download dist artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-files
+          path: dist
+
+      - name: Publish Package to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x' # Specify your desired Python version
+      - name: Install dependencies
+        run: |
+          pip install .[dev]
+      - name: Run tests with coverage
+        run: |
+          coverage run --source=pbi_parsers -m pytest tests/
+          coverage xml
+      - name: Upload coverage to Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          format: cobertura
+          file: coverage.xml

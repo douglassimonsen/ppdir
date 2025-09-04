@@ -1,0 +1,35 @@
+# Setup: go to https://github.com/<org/username>/<repo>/settings/actions and set Workflow permissions to "Read and write permissions"
+name: Deploy MkDocs Site
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
+      - '.github/workflows/deploy-docs.yml'
+
+jobs:
+  deploy-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+            fetch-depth: 0  # Fetch all history
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install MkDocs and theme
+        run: |
+          python -m pip install .[docs]
+
+      - name: Deploy documentation to GitHub Pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdocs gh-deploy --clean -f docs/mkdocs.yml

@@ -4,21 +4,29 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ppdir"
-description = "Better "
+description = "A pretty-printed version of dir(obj) for more comfortable debugging"
 readme = "README.md"
 requires-python = ">=3.11.0"
 dynamic = ["version"]
 dependencies = [
   "colorama>=0.4.6",
 ]
-
 [project.optional-dependencies]
 dev = [
   "build>=1.2.2",
+  "ruff>=0.12.7",
+]
+docs = [
+  "mkdocs>=1.6.1",
+  "mkdocs-material>=9.6.16",
+  "mkdocstrings-python>=0.30.0",
 ]
 
 [tool.hatch.version]
 path = "ppdir/__init__.py"
+
+[tool.coverage.run]
+relative_files = true
 
 [tool.doc8]
 max-line-length = 120
@@ -28,7 +36,6 @@ file-encoding = "utf8"
 line-length = 120
 preview = true
 target-version = "py311"
-
 
 [tool.ruff.lint]
 select = ["ALL"]
@@ -54,10 +61,6 @@ ignore = [
   "D104",
   "D105",
   "D107",
-  "FIX002",
-  "D203",
-  "D213",
+  "D203",    # ignored due to incompatibility with D211
+  "D213",    # ignored due to incompatibility with D212
 ]
-
-[tool.mypy]
-disable_error_code = "import-untyped"
