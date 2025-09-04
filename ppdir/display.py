@@ -22,16 +22,17 @@ def _display(
     include_signatures: bool = False,
 ) -> None:
     # We reverse the class order so the most specific class is on the bottom since that's likely what people care about
+    ret = ""
     for class_summary in data[::-1]:
         source_info = class_summary.source_info.to_string()
-        print(f"\n{Fore.BLUE}{class_summary.class_type.__name__} ({source_info}){Style.RESET_ALL}")
+        ret += f"\n{Fore.BLUE}{class_summary.class_type.__name__} ({source_info}){Style.RESET_ALL}\n"
 
         if class_summary.class_type.__doc__ and include_docs:
             docstr = textwrap.indent(class_summary.class_type.__doc__.splitlines()[0], INDENT)
-            print(f"{Fore.GREEN}{docstr}{Style.RESET_ALL}\n")
+            ret += f"{Fore.GREEN}{docstr}{Style.RESET_ALL}\n\n"
 
         if class_summary.attr_info:
-            print(f"{INDENT}Attributes:")
+            ret += f"{INDENT}Attributes:\n"
 
             vals = sorted(class_summary.attr_info, key=lambda v: v.name)
             colon_position: int = max(val.colon_position() for val in vals)
@@ -40,9 +41,9 @@ def _display(
                     continue
 
                 val_str = val.to_string(colon_position=colon_position, include_docs=include_docs)
-                print(f"{INDENT * 2}{Fore.GREEN}{val_str}{Style.RESET_ALL}")
+                ret += f"{INDENT * 2}{Fore.GREEN}{val_str}{Style.RESET_ALL}\n"
         if class_summary.method_info:
-            print(f"{INDENT}Methods:")
+            ret += f"{INDENT}Methods:\n"
             vals = sorted(class_summary.method_info, key=lambda v: v.name)
             colon_position: int = max(val.colon_position(include_signatures=include_signatures) for val in vals)
             for val in vals:
@@ -54,4 +55,6 @@ def _display(
                     include_docs=include_docs,
                     include_signatures=include_signatures,
                 )
-                print(f"{INDENT * 2}{Fore.GREEN}{val_str}{Style.RESET_ALL}")
+                ret += f"{INDENT * 2}{Fore.GREEN}{val_str}{Style.RESET_ALL}\n"
+
+    print(ret)

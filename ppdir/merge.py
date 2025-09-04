@@ -17,7 +17,6 @@ class ClassSummary:
 
 def get_info(inp_cls: Any) -> list[ClassSummary]:
     class_defines = get_class_defines(inp_cls)
-
     ret = []
     for mro_cls in inp_cls.mro():
         source_info = class_source_file.get_source_info(mro_cls)
@@ -27,7 +26,6 @@ def get_info(inp_cls: Any) -> list[ClassSummary]:
         method_info = get_method_docstrings(mro_cls)
         filtered_attr_info = [v for v in attr_info if v.name in defines]
         filtered_method_info = [v for v in method_info if v.name in defines]
-
         ret.append(
             ClassSummary(
                 class_type=mro_cls,

@@ -3,6 +3,9 @@ def _expanded_dir(cls: type) -> list[str]:
     ret.extend(cls.__dict__.keys())
     if "__annotations__" in cls.__dict__:
         ret.extend(cls.__annotations__.keys())
+    if "__pydantic_fields__" in cls.__dict__:
+        # If a field exists, but isn't set by the instance, it doesn't appear in the dir() call
+        ret.extend(cls.__pydantic_fields__.keys())
     return list(set(ret))
 
 
