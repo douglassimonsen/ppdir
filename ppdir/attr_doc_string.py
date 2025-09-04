@@ -1,6 +1,7 @@
 import ast
 import inspect
 from dataclasses import dataclass
+from typing import Literal
 
 
 @dataclass
@@ -9,8 +10,11 @@ class AttrInfo:
     type: str
     doc: str
 
+    def _pre_colon_str(self) -> str:
+        return f"{self.name} ({self.type})"
+
     def to_string(self, colon_position: int, *, include_docs: bool) -> str:
-        pre_colon = f"{self.name} ({self.type})".ljust(colon_position)
+        pre_colon = self._pre_colon_str().ljust(colon_position)
 
         if include_docs:
             doc_summary = self.doc.splitlines()[0] if self.doc else "--N/A--"
@@ -19,20 +23,30 @@ class AttrInfo:
         return pre_colon
 
     def colon_position(self) -> int:
-        return len(self.name) + len(self.type) + 3
+        return len(self._pre_colon_str())
 
 
 @dataclass
 class MethodInfo:
     name: str
-    type: str
+    signature: str
+    method_type: Literal["instance", "class", "static"]
     doc: str
 
-    def to_string(self, colon_position: int, *, include_docs: bool, include_signatures: bool) -> str:
+    def _pre_colon_str(self, *, include_signatures: bool) -> str:
         pre_colon = self.name
         if include_signatures:
-            pre_colon += f" ({self.type})"
-        pre_colon = pre_colon.ljust(colon_position)[:-1]
+            pre_colon += f" ({self.signature})"
+        return pre_colon
+
+    def to_string(self, colon_position: int, *, include_docs: bool, include_signatures: bool) -> str:
+        pre_colon = self._pre_colon_str(include_signatures=include_signatures).ljust(colon_position)
+
+        if self.method_type == "class":
+            pre_colon = f"\b\bᶜ {pre_colon}"
+        elif self.method_type == "static":
+            pre_colon = f"\b\bˢ {pre_colon}"
+
         if include_docs:
             doc_summary = self.doc.splitlines()[0] if self.doc else "--N/A--"
             return f"{pre_colon}: {doc_summary}"
@@ -40,9 +54,7 @@ class MethodInfo:
         return pre_colon
 
     def colon_position(self, *, include_signatures: bool) -> int:
-        if include_signatures:
-            return len(self.name) + len(self.type) + 3
-        return len(self.name) + 3
+        return len(self._pre_colon_str(include_signatures=include_signatures))
 
 
 def ast_find_classdef(tree: ast.Module) -> ast.ClassDef | None:
@@ -95,14 +107,23 @@ def get_attr_docstrings(cls: type) -> list[AttrInfo]:
 
 
 def get_method_docstrings(cls: type) -> list[MethodInfo]:
-    methods = inspect.getmembers(cls, predicate=inspect.ismethod)
+    methods = inspect.getmembers(cls, predicate=lambda x: inspect.ismethod(x) or inspect.isfunction(x))
     ret = []
     for method in methods:
         signature = inspect.signature(method[1])  # This is just to ensure it doesn't error
+
+        method_with_possible_decorators = inspect.getattr_static(cls, method[0])
+        method_type = "instance"
+        if isinstance(method_with_possible_decorators, classmethod):
+            method_type = "class"
+        elif isinstance(method_with_possible_decorators, staticmethod):
+            method_type = "static"
+
         ret.append(
             MethodInfo(
                 name=method[0],
-                type=str(signature),
+                signature=str(signature),
+                method_type=method_type,
                 doc=method[1].__doc__ or "",
             ),
         )
