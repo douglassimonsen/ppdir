@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 from ppdir import defaults, ppdir
 
-defaults(include_docs=False, include_signatures=False, include_dunders=False)
+defaults(include_docs=True, include_signatures=False, include_dunders=True)
 
 
 class BaseLayer(BaseModel):
@@ -45,4 +45,5 @@ class NextLayer(BaseLayer):
 
 
 x = NextLayer(x=1, y=2, z=3, a="b")
+print(dir(x))
 ppdir(x)
