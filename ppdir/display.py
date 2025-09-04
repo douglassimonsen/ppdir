@@ -8,6 +8,7 @@ init()
 if TYPE_CHECKING:
     from .merge import ClassSummary
 INDENT = " " * 2
+MAX_ALIGNING_LENGTH = 60
 
 
 def is_dunder(name: str) -> bool:
@@ -36,7 +37,7 @@ def _display(
 
             vals = sorted(class_summary.attr_info, key=lambda v: v.name)
             colon_position: int = max(val.colon_position() for val in vals)
-            colon_position = colon_position if colon_position <= 60 else 0
+            colon_position = colon_position if colon_position <= MAX_ALIGNING_LENGTH else 0
 
             for val in vals:
                 if not include_dunders and is_dunder(val.name):
@@ -48,7 +49,7 @@ def _display(
             ret += f"{INDENT}Methods:\n"
             vals = sorted(class_summary.method_info, key=lambda v: v.name)
             colon_position: int = max(val.colon_position(include_signatures=include_signatures) for val in vals)
-            colon_position = colon_position if colon_position <= 60 else 0
+            colon_position = colon_position if colon_position <= MAX_ALIGNING_LENGTH else 0
 
             for val in vals:
                 if not include_dunders and is_dunder(val.name):
