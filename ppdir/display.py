@@ -6,7 +6,7 @@ from colorama import Fore, Style, init
 init()
 
 if TYPE_CHECKING:
-    from .main import ClassSummary
+    from .merge import ClassSummary
 INDENT = " " * 2
 
 
