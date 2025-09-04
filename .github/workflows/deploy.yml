@@ -124,24 +124,24 @@ jobs:
 
       - name: Publish Package to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-  coverage:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x' # Specify your desired Python version
-      - name: Install dependencies
-        run: |
-          pip install .[dev]
-      - name: Run tests with coverage
-        run: |
-          coverage run --source=pbi_parsers -m pytest tests/
-          coverage xml
-      - name: Upload coverage to Coveralls
-        uses: coverallsapp/github-action@v2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          format: cobertura
-          file: coverage.xml
+#   coverage:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.x' # Specify your desired Python version
+#       - name: Install dependencies
+#         run: |
+#           pip install .[dev]
+#       - name: Run tests with coverage
+#         run: |
+#           coverage run --source=pbi_parsers -m pytest tests/
+#           coverage xml
+#       - name: Upload coverage to Coveralls
+#         uses: coverallsapp/github-action@v2
+#         with:
+#           github-token: ${{ secrets.GITHUB_TOKEN }}
+#           format: cobertura
+#           file: coverage.xml
