@@ -36,6 +36,8 @@ def _display(
 
             vals = sorted(class_summary.attr_info, key=lambda v: v.name)
             colon_position: int = max(val.colon_position() for val in vals)
+            colon_position = colon_position if colon_position <= 60 else 0
+
             for val in vals:
                 if not include_dunders and is_dunder(val.name):
                     continue
@@ -46,6 +48,8 @@ def _display(
             ret += f"{INDENT}Methods:\n"
             vals = sorted(class_summary.method_info, key=lambda v: v.name)
             colon_position: int = max(val.colon_position(include_signatures=include_signatures) for val in vals)
+            colon_position = colon_position if colon_position <= 60 else 0
+
             for val in vals:
                 if not include_dunders and is_dunder(val.name):
                     continue

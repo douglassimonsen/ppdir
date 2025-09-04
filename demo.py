@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 
-from ppdir import ppdir
+from ppdir import defaults, ppdir
+
+defaults(include_docs=False, include_signatures=False, include_dunders=False)
 
 
 class BaseLayer(BaseModel):
@@ -13,28 +15,34 @@ class BaseLayer(BaseModel):
 
         Details are here
         """
-        print("asd")
+        print("asd", self)
 
     def func2(self) -> None:
-        """Example test.
+        """Example test2.
 
         Details are here
         """
-        print("asd")
+        print("asd", self)
 
 
 class NextLayer(BaseLayer):
     a: str
+    """asdasd"""
 
     @staticmethod
-    def test() -> int:
+    def static_test() -> int:
         """Example text."""
         return 1
 
-    def func(self) -> None:
+    @classmethod
+    def class_test(cls) -> int:
+        """Example class method."""
+        return 1
+
+    def instance_test(self) -> None:
         """Asdasd."""
+        return
 
 
 x = NextLayer(x=1, y=2, z=3, a="b")
-print(dir(x))
 ppdir(x)
