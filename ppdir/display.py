@@ -1,38 +1,57 @@
+import textwrap
+from typing import TYPE_CHECKING
+
 from colorama import Fore, Style, init
 
 init()
 
+if TYPE_CHECKING:
+    from .main import ClassSummary
+INDENT = " " * 2
+
+
+def is_dunder(name: str) -> bool:
+    return name.startswith("__") and name.endswith("__")
+
 
 def _display(
-    data: dict[str, Categories],
+    data: list["ClassSummary"],
     *,
-    class_order: list[str],
     include_dunders: bool = False,
     include_docs: bool = True,
+    include_signatures: bool = False,
 ) -> None:
     # We reverse the class order so the most specific class is on the bottom since that's likely what people care about
-    for class_name in class_order[::-1]:
-        print(f"\n{Fore.BLUE}{class_name}{Style.RESET_ALL}")
-        vals = data.get(class_name, Categories())
-        if vals.attributes:
-            print("    Attributes:")
-            max_len = max(len(val.name) for val in vals.attributes)
-            for val in vals.attributes:
-                val_str = val.to_string(include_docs=include_docs, max_len=max_len)
-                print(
-                    f"        {Fore.GREEN}{val_str}{Style.RESET_ALL}",
+    for class_summary in data[::-1]:
+        source_info = class_summary.source_info.to_string()
+        print(f"\n{Fore.BLUE}{class_summary.class_type.__name__} ({source_info}){Style.RESET_ALL}")
+
+        if class_summary.class_type.__doc__ and include_docs:
+            docstr = textwrap.indent(class_summary.class_type.__doc__.splitlines()[0], INDENT)
+            print(f"{Fore.GREEN}{docstr}{Style.RESET_ALL}\n")
+
+        if class_summary.attr_info:
+            print(f"{INDENT}Attributes:")
+
+            vals = sorted(class_summary.attr_info, key=lambda v: v.name)
+            colon_position: int = max(val.colon_position() for val in vals)
+            for val in vals:
+                if not include_dunders and is_dunder(val.name):
+                    continue
+
+                val_str = val.to_string(colon_position=colon_position, include_docs=include_docs)
+                print(f"{INDENT * 2}{Fore.GREEN}{val_str}{Style.RESET_ALL}")
+        if class_summary.method_info:
+            print(f"{INDENT}Methods:")
+            vals = sorted(class_summary.method_info, key=lambda v: v.name)
+            colon_position: int = max(val.colon_position(include_signatures=include_signatures) for val in vals)
+            for val in vals:
+                if not include_dunders and is_dunder(val.name):
+                    continue
+
+                val_str = val.to_string(
+                    colon_position=colon_position,
+                    include_docs=include_docs,
+                    include_signatures=include_signatures,
                 )
-        if vals.methods:
-            print("    Methods:")
-            max_len = max(len(val.name) for val in vals.methods)
-            for val in vals.methods:
-                val_str = val.to_string(include_docs=include_docs, max_len=max_len)
-                print(
-                    f"        {Fore.YELLOW}{val_str}{Style.RESET_ALL}",
-                )
-        if vals.dunders and include_dunders:
-            print("    Dunders:")
-            max_len = max(len(val.name) for val in vals.dunders)
-            for val in vals.dunders:
-                val_str = val.to_string(include_docs=include_docs, max_len=max_len)
-                print(f"        {Fore.RED}{val_str}{Style.RESET_ALL}")
+                print(f"{INDENT * 2}{Fore.GREEN}{val_str}{Style.RESET_ALL}")

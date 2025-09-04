@@ -8,6 +8,9 @@ class SourceLines:
     start: int
     end: int
 
+    def to_string(self) -> str:
+        return f"{self.path}: {self.start}-{self.end}"
+
 
 def get_source_info(cls: type) -> SourceLines:
     """Get the source file where the class is defined.
