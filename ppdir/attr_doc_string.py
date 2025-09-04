@@ -14,11 +14,11 @@ class AttrInfo:
         return f"{self.name} ({self.type})"
 
     def to_string(self, colon_position: int, *, include_docs: bool) -> str:
-        pre_colon = self._pre_colon_str().ljust(colon_position)
+        pre_colon = f"{self._pre_colon_str()}:".ljust(colon_position + 1)
 
         if include_docs:
             doc_summary = self.doc.splitlines()[0] if self.doc else "--N/A--"
-            return f"{pre_colon}: {doc_summary}"
+            return f"{pre_colon} {doc_summary}"
 
         return pre_colon
 
@@ -40,7 +40,7 @@ class MethodInfo:
         return pre_colon
 
     def to_string(self, colon_position: int, *, include_docs: bool, include_signatures: bool) -> str:
-        pre_colon = self._pre_colon_str(include_signatures=include_signatures).ljust(colon_position)
+        pre_colon = f"{self._pre_colon_str(include_signatures=include_signatures)}:".ljust(colon_position + 1)
 
         if self.method_type == "class":
             pre_colon = f"\b\bᶜ {pre_colon}"
@@ -49,7 +49,7 @@ class MethodInfo:
 
         if include_docs:
             doc_summary = self.doc.splitlines()[0] if self.doc else "--N/A--"
-            return f"{pre_colon}: {doc_summary}"
+            return f"{pre_colon} {doc_summary}"
 
         return pre_colon
 
