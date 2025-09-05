@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "ppdir"
+name = "pretty-dir"
 description = "A pretty-printed version of dir(obj) for more comfortable debugging"
 readme = "README.md"
 requires-python = ">=3.11.0"
