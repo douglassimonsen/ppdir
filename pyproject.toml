@@ -25,6 +25,11 @@ docs = [
 [tool.hatch.version]
 path = "ppdir/__init__.py"
 
+[tool.hatch.build]
+include = [
+  "ppdir/**",
+]
+
 [tool.coverage.run]
 relative_files = true
 
