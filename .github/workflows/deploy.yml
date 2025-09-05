@@ -124,7 +124,9 @@ jobs:
 
       - name: Publish Package to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-#   coverage:
+        with:
+          verbose: true
+        #   coverage:
 #     runs-on: ubuntu-latest
 #     steps:
 #       - uses: actions/checkout@v4
