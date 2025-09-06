@@ -14,12 +14,12 @@ class AttrInfo:
         return f"{self.name} ({self.type})"
 
     def to_string(self, colon_position: int, *, include_docs: bool) -> str:
-        pre_colon = f"{self._pre_colon_str()}:".ljust(colon_position + 1)
+        colon = ":" if include_docs else ""
+        pre_colon = f"{self._pre_colon_str()}{colon}".ljust(colon_position + 1)
 
         if include_docs:
-            doc_summary = self.doc.splitlines()[0] if self.doc else "--N/A--"
+            doc_summary = self.doc.strip().splitlines()[0] if self.doc else "--N/A--"
             return f"{pre_colon} {doc_summary}"
-
         return pre_colon
 
     def colon_position(self) -> int:
@@ -40,7 +40,8 @@ class MethodInfo:
         return pre_colon
 
     def to_string(self, colon_position: int, *, include_docs: bool, include_signatures: bool) -> str:
-        pre_colon = f"{self._pre_colon_str(include_signatures=include_signatures)}:".ljust(colon_position + 1)
+        colon = ":" if include_docs else ""
+        pre_colon = f"{self._pre_colon_str(include_signatures=include_signatures)}{colon}".ljust(colon_position + 1)
 
         if self.method_type == "class":
             pre_colon = f"\b\bᶜ {pre_colon}"
@@ -48,7 +49,7 @@ class MethodInfo:
             pre_colon = f"\b\bˢ {pre_colon}"
 
         if include_docs:
-            doc_summary = self.doc.splitlines()[0] if self.doc else "--N/A--"
+            doc_summary = self.doc.strip().splitlines()[0] if self.doc else "--N/A--"
             return f"{pre_colon} {doc_summary}"
 
         return pre_colon
@@ -91,7 +92,7 @@ def get_attr_docstrings(cls: type) -> list[AttrInfo]:
             # therefore another access to value is needed
             assert isinstance(expr.value, ast.Constant)
             doc_string = expr.value.value
-            doc_string = doc_string.strip() if isinstance(doc_string, str) else None
+            doc_string = doc_string if isinstance(doc_string, str) else None
             last_attr = attribute_docs[-1]
             if not last_attr.doc and doc_string is not None:
                 last_attr.doc = doc_string
@@ -116,6 +117,7 @@ def get_method_docstrings(cls: type) -> list[MethodInfo]:
         signature = inspect.signature(method[1])  # This is just to ensure it doesn't error
 
         method_with_possible_decorators = inspect.getattr_static(cls, method[0])
+
         method_type = "instance"
         if isinstance(method_with_possible_decorators, classmethod):
             method_type = "class"

@@ -1,11 +1,14 @@
 # Overview
 
-The goal of this library is to create a more useful debugging tool than the built-in function `dir`. The core issues of `dir` this library addresses are:
+How often have you wished for a more well organized output from Python's built-in `dir` function when looking through a deeply nested [pydantic](https://pydantic-docs.helpmanual.io/) model after seeing page due to tens of private methods? Running `dir` on a [pandas DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html) produces a list of **443 entries**!
+
+The goal of this library is to create a more useful debugging tool than the built-in function `dir(<class>)`. The issues with the built-in `dir(<class>)` addressed by this library are:
 
 1. Inclusion of dunder methods that are very rarely useful
 2. No differentiation between attributes/methods
 3. No docstring display
 4. No grouping of similar functionality together, only alphabetical sorting
+5. No way to jump to the source code of the 
 
 This library takes the output of `dir` and runs the following steps:
 
@@ -17,6 +20,10 @@ This library takes the output of `dir` and runs the following steps:
 3. Pulls the summary of the docstring for each attribute/method, if it exists
    - For attributes, there is no `__doc__` attribute, but we follow the convention of [PEP-258](https://www.python.org/dev/peps/pep-0258/) and most autocompletion tools of the next literal expression if it exists
 4. Colorizes the output to visually differentiate the classes, attributes, methods, and dunder methods
+
+## Limitations
+
+Currently, this library only works with classes. For all other entities - functions, modules, etc - it falls back to the built-in `dir` implementation.
 
 # Installation
 

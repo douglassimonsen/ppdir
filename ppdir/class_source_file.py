@@ -9,7 +9,7 @@ class SourceLines:
     end: int
 
     def to_string(self) -> str:
-        return f"{self.path}: {self.start}-{self.end}"
+        return f"{self.path}, lines {self.start}-{self.end}"
 
 
 def get_source_info(cls: type) -> SourceLines:
