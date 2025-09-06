@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "pretty-dir"
 description = "A pretty-printed version of dir(obj) for more comfortable debugging"
-readme = "README.md"
+readme = "PYPI.md"
 requires-python = ">=3.11.0"
 dynamic = ["version"]
 dependencies = [
