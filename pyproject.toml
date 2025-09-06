@@ -5,6 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "pretty-dir"
 description = "A pretty-printed version of dir(obj) for more comfortable debugging"
+# Switched to PYPI so that github and pypi can display different info. Github always uses the README.md file and PYPI uses the file set by `project.readme`
 readme = "PYPI.md"
 requires-python = ">=3.11.0"
 dynamic = ["version"]
