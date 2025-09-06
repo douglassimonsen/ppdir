@@ -15,8 +15,8 @@ This library takes the output of `dir` and runs the following steps:
 1. Groups the attributes and methods by the class they are defined by
    - Identifies the source code location of the class, allowing you to quickly jump to them for a deeper dive in IDEs like VS Code.
    - Prints the docstring summary of the class.
-2. Identifies if it is a dunder method, normal method, or attribute
-   - Within normal methods, adds a "ᶜ" or "ˢ" to indicate if it is a classmethod or staticmethod rather than a standard instance method.
+2. Identifies if it is a dunder method, non-dunder method, or attribute
+   - Within non-dunder methods, adds a "ᶜ" or "ˢ" to indicate if it is a classmethod or staticmethod rather than a standard instance method.
 3. Pulls the summary of the docstring for each attribute/method, if it exists
    - For attributes, there is no `__doc__` attribute, but we follow the convention of [PEP-258](https://www.python.org/dev/peps/pep-0258/) and most autocompletion tools of the next literal expression if it exists
 4. Colorizes the output to visually differentiate the classes, attributes, methods, and dunder methods
