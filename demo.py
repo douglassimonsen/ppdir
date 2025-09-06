@@ -28,6 +28,7 @@ class BaseLayer(BaseModel):
 class NextLayer(BaseLayer):
     a: str
     """asdasd"""
+    b: int
 
     @staticmethod
     def static_test() -> int:
@@ -44,6 +45,6 @@ class NextLayer(BaseLayer):
         return
 
 
-x = NextLayer(x=1, y=2, z=3, a="b")
+x = NextLayer(x=1, y=2, z=3, a="b", b=1)
 print(dir(x))
 ppdir(x)

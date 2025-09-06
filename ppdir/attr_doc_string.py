@@ -76,10 +76,7 @@ def get_attr_docstrings(cls: type) -> list[AttrInfo]:
     assert tree is not None
 
     attribute_docs = []
-    last_doc: str | None = None
 
-    # This section can cause issues if an IDIOT creates docstrings for the first
-    # class attribute, but not for the class itself.
     body = tree.body
     if not isinstance(body[0], ast.AnnAssign):
         body = body[1:]
@@ -87,12 +84,17 @@ def get_attr_docstrings(cls: type) -> list[AttrInfo]:
     for expr in body:
         # When encouter an Expr, check if the expr a string
         if isinstance(expr, ast.Expr):
+            if not attribute_docs:
+                continue
+
             # The value is a ast.Value node
             # therefore another access to value is needed
             assert isinstance(expr.value, ast.Constant)
-            value = expr.value.value
-            if isinstance(value, str):
-                last_doc = value.strip()
+            doc_string = expr.value.value
+            doc_string = doc_string.strip() if isinstance(doc_string, str) else None
+            last_attr = attribute_docs[-1]
+            if not last_attr.doc and doc_string is not None:
+                last_attr.doc = doc_string
 
         # if the last known doc string is not none
         # and this next node is an annotation, that's a docstring
@@ -100,8 +102,9 @@ def get_attr_docstrings(cls: type) -> list[AttrInfo]:
             # expr.target is a ast.Name
             name = ast.unparse(expr.target)
             type_name = ast.unparse(expr.annotation)
-            attribute_docs.append(AttrInfo(name=name, type=type_name, doc=last_doc or ""))
-            last_doc = None
+            attribute_docs.append(
+                AttrInfo(name=name, type=type_name, doc=""),
+            )
 
     return attribute_docs
 
