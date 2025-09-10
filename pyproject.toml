@@ -12,6 +12,11 @@ dynamic = ["version"]
 dependencies = [
   "colorama>=0.4.6",
 ]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+]
+
 [project.optional-dependencies]
 dev = [
   "build>=1.2.2",
@@ -22,6 +27,9 @@ docs = [
   "mkdocs-material>=9.6.16",
   "mkdocstrings-python>=0.30.0",
 ]
+[project.urls]
+Homepage = "https://github.com/douglassimonsen/ppdir"
+Documentation = "https://github.com/douglassimonsen/ppdir"
 
 [tool.hatch.version]
 path = "ppdir/__init__.py"
