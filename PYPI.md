@@ -33,6 +33,19 @@ You can install the library using pip:
 pip install pretty-dir
 ```
 
+## Auto-loading in PDB (Breakpoint)
+
+[PDB](https://docs.python.org/3/library/pdb.html) is the built-in Python debugger that you can invoke with the `breakpoint()` function (or `import pdb; pdb.set_trace()` in Python versions before 3.7). To make `ppdir` automatically available in every PDB session, you can include it in a [PDB configuration file](https://docs.python.org/3/library/pdb.html#debugger-commands).
+
+To make and add `ppdir` to your global PDB configuration, create a file named `~/.pdbrc` if it doesn't already exist, and add the following lines to it:
+
+```python
+from ppdir import ppdir, defaults
+defaults(include_docs=True)  # remember to set your preferred defaults!
+```
+
+Now `ppdir` will be automatically available whenever you call `breakpoint()` in your code.
+
 # Basic Usage Example
 
 ```python
